@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Echo • Your Private Journal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Echo%22,%22short_name%22:%22Echo%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23111111%22,%22theme_color%22:%22%236b21a8%22,%22icons%22:[{%22src%22:%22https://picsum.photos/id/1015/192/192%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22}]}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-neutral-950 text-white font-sans overflow-x-hidden">
+    <div class="max-w-[420px] mx-auto min-h-screen bg-neutral-950 flex flex-col shadow-2xl relative">
+        
+        <!-- HEADER -->
+        <div class="bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-600 px-6 pt-12 pb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-5xl font-bold tracking-tighter" style="font-family: 'Playfair Display', serif;">echo</h1>
+                    <p class="text-purple-200 text-sm tracking-[2px] -mt-1">your thoughts</p>
+                </div>
+                <div onclick="newEntry()" 
+                     class="w-11 h-11 bg-white/20 hover:bg-white/30 backdrop-blur-xl rounded-3xl flex items-center justify-center text-3xl transition-all active:scale-95 cursor-pointer">
+                    ✍️
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div id="main-content" class="flex-1 overflow-y-auto pb-24 px-5 pt-4">
+            
+            <!-- TODAY TAB -->
+            <div id="tab-today" class="tab-content">
+                <div class="mb-6">
+                    <p class="text-purple-300 text-sm font-medium" id="today-date"></p>
+                    <p id="daily-prompt" class="text-lg font-medium text-neutral-300 italic mt-1 min-h-[52px]"></p>
+                </div>
+
+                <!-- Mood Picker -->
+                <div class="flex justify-between mb-8 px-2" id="mood-picker">
+                    <!-- JS filled -->
+                </div>
+
+                <!-- Writing Area -->
+                <textarea id="entry-text" rows="12"
+                          class="w-full bg-neutral-900 border border-white/10 focus:border-violet-500 rounded-3xl p-6 text-lg placeholder:text-neutral-500 outline-none resize-none"
+                          placeholder="What’s on your mind today..."></textarea>
+
+                <button onclick="saveEntry()" 
+                        class="mt-6 w-full py-5 bg-white text-neutral-950 font-semibold rounded-3xl text-base active:scale-95 transition-all">
+                    SAVE TO ECHO
+                </button>
+            </div>
+
+            <!-- HISTORY TAB -->
+            <div id="tab-history" class="tab-content hidden">
+                <div class="relative mb-6">
+                    <input id="search-input" 
+                           onkeyup="filterEntries()"
+                           class="w-full bg-neutral-900 border border-white/10 focus:border-violet-500 rounded-3xl px-6 py-4 text-base outline-none placeholder:text-neutral-500"
+                           placeholder="Search your entries...">
+                </div>
+                <div id="entries-list" class="space-y-4 pb-12">
+                    <!-- JS -->
+                </div>
+            </div>
+
+            <!-- PROMPTS TAB -->
+            <div id="tab-prompts" class="tab-content hidden">
+                <h2 class="text-xl font-semibold mb-5 px-1">Daily Prompts</h2>
+                <div id="prompts-grid" class="grid grid-cols-1 gap-4">
+                    <!-- JS -->
+                </div>
+            </div>
+
+            <!-- INSIGHTS TAB -->
+            <div id="tab-insights" class="tab-content hidden">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-neutral-900 rounded-3xl p-6 text-center">
+                        <p class="text-xs text-neutral-400">CURRENT STREAK</p>
+                        <p id="streak-count" class="text-6xl font-bold text-amber-400 mt-2">0</p>
+                        <p class="text-sm text-neutral-400">days writing</p>
+                    </div>
+                    <div class="bg-neutral-900 rounded-3xl p-6 text-center">
+                        <p class="text-xs text-neutral-400">TOTAL ENTRIES</p>
+                        <p id="total-entries" class="text-6xl font-bold text-violet-400 mt-2">0</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 bg-neutral-900 rounded-3xl p-6">
+                    <p class="text-xs uppercase tracking-widest text-neutral-400 mb-4">Recent Moods</p>
+                    <div id="mood-history" class="flex gap-6 justify-center text-5xl">
+                        <!-- JS -->
+                    </div>
+                </div>
+                
+                <div onclick="clearAllData()" 
+                     class="mt-10 text-center text-xs text-red-400 hover:text-red-300 cursor-pointer">Clear all entries</div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="fixed bottom-0 left-1/2 -translate-x-1/2 max-w-[420px] w-full bg-neutral-950 border-t border-white/10 z-50">
+            <div class="flex justify-around items-center py-3 px-6 text-neutral-400">
+                <div onclick="switchTab(0)" id="nav-0" class="nav-item flex flex-col items-center text-violet-400">
+                    <div class="text-2xl mb-0.5">📖</div>
+                    <div class="text-[10px] font-medium">TODAY</div>
+                </div>
+                <div onclick="switchTab(1)" id="nav-1" class="nav-item flex flex-col items-center">
+                    <div class="text-2xl mb-0.5">📚</div>
+                    <div class="text-[10px] font-medium">HISTORY</div>
+                </div>
+                <div onclick="switchTab(2)" id="nav-2" class="nav-item flex flex-col items-center">
+                    <div class="text-2xl mb-0.5">💡</div>
+                    <div class="text-[10px] font-medium">PROMPTS</div>
+                </div>
+                <div onclick="switchTab(3)" id="nav-3" class="nav-item flex flex-col items-center">
+                    <div class="text-2xl mb-0.5">📊</div>
+                    <div class="text-[10px] font-medium">INSIGHTS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOAST -->
+        <div id="toast" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 max-w-[420px] w-full px-6 z-[200]">
+            <div class="bg-neutral-800 text-white text-sm px-6 py-4 rounded-3xl shadow-2xl text-center flex items-center justify-center gap-2">
+                <span id="toast-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
